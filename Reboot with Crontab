@@ -1,0 +1,73 @@
+#!/bin/sh
+PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin
+#safeReboot trixbox and sangoma
+#
+#installation:
+#    cp /usr/src/safeReboot.sh /sbin/safeReboot
+#    chmod 755 /sbin/safeReboot
+#
+#test:   /usr/src/safeReboot.sh
+#script: /sbin/safeReboot
+#
+#crontab -e 25 1 * * * /sbin/safeReboot
+#J05
+#
+srLog="/var/log/safeReboot.log"
+ 
+function wrLog
+{
+    echo "$1" >> $srLog
+    echo $1
+}
+ 
+wrLog ">safeReboot"
+wrLog "[`date`]"
+wrLog "--amportal stop--"
+/usr/sbin/amportal stop >> $srLog
+wrLog ""
+wrLog "  Sleeping 25 secs"
+wrLog ""
+sleep 25
+wrLog "--stoping asterisk (shouldn't be running)--"
+asterisk -rx "stop gracefully" >> $srLog
+wrLog ""
+wrLog "  Sleeping 9 secs"
+wrLog ""
+sleep 9
+if [ -e "/var/run/asterisk/asterisk.pid" ]; then
+#
+    /sbin/service asterisk stop >> $srLog
+    wrLog ""
+    wrLog "  Sleeping 9 secs"
+    wrLog ""
+    sleep 9
+#
+fi
+wrLog "--stoping wanrouter--"
+/usr/sbin/wanrouter stop >> $srLog
+wrLog ""
+wrLog "  Sleeping 9 secs"
+sleep 9
+if [ -e "/var/run/wanpipe_is_running" ]; then
+#
+        if [ -e "/var/run/asterisk/asterisk.pid" ]; then
+        #
+        wrLog " WARNING! asterisk todavia estaba corriendo, intentando detener el servicio..."
+                /sbin/service asterisk stop >> $srLog
+                wrLog ""
+                wrLog "  Sleeping 9 secs"
+                wrLog ""
+                sleep 9
+        #
+        fi
+ 
+       /usr/sbin/wanrouter stop >> $srLog
+       sleep 9
+#
+fi
+wrLog ""
+#echo "Asterisk DOWN [pbxcc.pricetravel.com.mx]: `date +%Y%m%d_%H%M%S`" | mail -s "Asterisk[PBX] REINICIO AUTOMATICO `date +%d%m-%Y_%H:%M:%S`"  it@pricetravel.com.mx
+wrLog "--Rebooting the system NOW by `whoami` (`date`)--"
+wrLog ">>"
+wrLog ""
+/sbin/shutdown -r now >> $srLog
