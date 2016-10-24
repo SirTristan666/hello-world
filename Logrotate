@@ -1,0 +1,44 @@
+# see "man logrotate" for details
+# rotate log files daily daily
+# keep 16 weeks worth of backlogs rotate 32
+# create new (empty) log files after rotating old ones create
+# use date as a suffix of the rotated file dateext
+# uncomment this if you want your log files compressed
+#compress
+# RPM packages drop log rotation information into this directory include /etc/logrotate.d
+# no packages own wtmp and btmp -- we'll rotate them here
+/var/log/wtmp
+{
+     daily
+     create 0664 root utmp
+     minsize 1M
+     rotate 1
+ }
+  
+/var/log/btmp
+{
+     missingok
+     daily
+     create 0600 root utmp
+     rotate 1
+}
+
+#Modify /etc/logrotate.conf change saves for "daily"
+
+/var/log/asterisk/*_log
+/var/log/asterisk/debug
+/var/log/asterisk/messages
+/var/log/asterisk/full {
+        daily
+        minsize 50M
+        rotate 32
+        missingok
+        compress
+        delaycompress
+        notifempty
+        sharedscripts
+        postrotate
+                /usr/sbin/asterisk -rx 'logger reload' > /dev/null 2> /dev/null
+        endscript
+}
+#Modify /etc/logrotate.d/asterisk
