@@ -1,0 +1,29 @@
+#!/bin/bash
+ 
+prompt()
+{
+  while true
+  do
+    echo -n "$* y/n? "
+    read reply
+    if [ "$reply" = y -o "$reply" = Y ]
+    then
+       return 0
+    elif [ "$reply" = n -o "$reply" = N ]
+    then
+       echo "Action cancelled"
+       exit 1
+    else
+       echo "Please enter 'y' or 'n'"
+    fi
+  done
+}
+ 
+echo "Before proceeding to perform shutdown, please ensure you have approval to perform this task"
+ 
+if prompt "Would you like to proceed"
+then
+   prompt "Are you absolutely sure this is $servername" && /sbin/shutdown -h now
+fi
+
+#create the file in /usr/local/ give permissions, make the aliases as the name you put
