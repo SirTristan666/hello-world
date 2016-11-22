@@ -1,0 +1,11 @@
+Modificar los valores en /etc/security/limits.conf
+Valor recomendado para soft y hard limit: 50,000
+Modificar los valores en /etc/asterisk/asterisk.conf
+Agregar la siguiente linea: maxfiles=50000
+Reiniciar el equipo.
+
+Verificar para el user asterisk los archivos totales que puede abrir
+ Ver como...
+1.- Verificar PID del proceso de Asterisk
+2.- Abrir el archivo /proc/PID_ASTERISK/limits
+2.- Max open files = 50000
