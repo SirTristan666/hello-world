@@ -1,0 +1,41 @@
+
+
+Iniciar sesión en el conmutador como root y correr el siguiente script.
+cd /usr/src/
+DD_API_KEY=APIKEY bash -c "$(curl -L https://raw.githubusercontent.com/DataDog/dd-agent/master/packaging/datadog-agent/source/install_agent.sh)"
+
+Despues de que se complete el proceso de instalación de Datadog en el conmutador bajar el plugin para monitorear asterisk con datadog y proceder a su instalacion.
+cd /usr/src/
+wget https://github.com/mafairnet/datadog-asteriskpbx/archive/master.zip
+unzip master.zip
+cd Asterisk-PBX-Integration-for-Datadog-master/
+
+Instalamos la librería de python para asterisk
+
+/opt/datadog-agent/embedded/bin/pip install pyst2
+
+Copiamos los archivos necesarios
+cp -R checks.d/asteriskpbx.py /opt/datadog-agent/agent/checks.d/
+cp -R conf.d/asteriskpbx.yaml /etc/dd-agent/conf.d/
+
+Modificamos las credenciales para que el modulo pueda acceder a asterisk
+nano /etc/dd-agent/conf.d/asteriskpbx.yaml
+
+Debemos que agregar el usuario y la contraseña del manager
+init_config:
+instances:
+- host: localhost #defaults to localhost
+port: 5038 #defaults to 5038
+manager_user: user #required
+manager_secret: secret #required
+#this user needs to have the command write privilege
+
+Reiniciamos el servicio de datadog
+/etc/init.d/datadog-agent restart
+
+Checamos que se haya cargado correctamente el modulo de asterisk
+/etc/init.d/datadog-agent info
+
+Se ha terminado de instalar datadog con modulo de monitoreo para asterisk.
+
+ 
