@@ -1,0 +1,77 @@
+Configuración.
+
+    Crear un archivo llamado confirm_shutdown en /usr/local/bin
+
+    Copiar y pegar el Código para Apagado, modificando $servername por el nombre del servidor donde se configura.
+    #!/bin/bash
+     
+    prompt()
+    {
+      while true
+      do
+        echo -n "$* y/n? "
+        read reply
+        if [ "$reply" = y -o "$reply" = Y ]
+        then
+           return 0
+        elif [ "$reply" = n -o "$reply" = N ]
+        then
+           echo "Action cancelled"
+           exit 1
+        else
+           echo "Please enter 'y' or 'n'"
+        fi
+      done
+    }
+     
+    echo "Before proceeding to perform shutdown, please ensure you have approval to perform this task"
+     
+    if prompt "Would you like to proceed"
+    then
+       prompt "Are you absolutely sure this is $servername" && /sbin/shutdown -h now
+    fi
+    Guardar el archivo con los cambios.
+    Darle permisos de ejecucion 
+    #chmod 755
+
+    Crear otro archivo llamado confirm_reboot en /usr/local/bin
+
+    Copiar y pegar el Código para reinicio, modificando $servername por el nombre del servidor donde se configura.
+    #!/bin/bash
+     
+    prompt()
+    {
+      while true
+      do
+        echo -n "$* y/n? "
+        read reply
+        if [ "$reply" = y -o "$reply" = Y ]
+        then
+           return 0
+        elif [ "$reply" = n -o "$reply" = N ]
+        then
+           echo "Action cancelled"
+           exit 1
+        else
+           echo "Please enter 'y' or 'n'"
+        fi
+      done
+    }
+     
+     
+    echo "Before proceeding to perform reboot, please ensure you have approval to perform this task"
+    if prompt "Would you like to proceed"
+    then
+       prompt "Are you absolutely sure this is $servername" && /sbin/reboot
+    fi
+    Guardar el archivo con los cambios.
+    Darle permisos de ejecución chmod 755
+
+    Modificar el archivo de aliases /etc/bashrc
+
+    Ir al final del archivo y agregar las siguientes lineas:
+    alias shutdown='confirm_shutdown'
+    alias halt='confirm_shutdown'
+    alias poweroff='confirm_shutdown'
+    alias reboot='confirm_reboot'
+    Reiniciar el servidor.
